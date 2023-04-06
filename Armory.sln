@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Armory.BL", "Armory.BL\Armory.BL.csproj", "{8BBA6724-C3C0-4CAD-A715-53A60978F533}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Armory.UI", "Armory.UI\Armory.UI.csproj", "{B4A263E1-9F7C-4B0B-ACE4-4344A9B7AF92}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BBA6724-C3C0-4CAD-A715-53A60978F533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BBA6724-C3C0-4CAD-A715-53A60978F533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BBA6724-C3C0-4CAD-A715-53A60978F533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BBA6724-C3C0-4CAD-A715-53A60978F533}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4A263E1-9F7C-4B0B-ACE4-4344A9B7AF92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4A263E1-9F7C-4B0B-ACE4-4344A9B7AF92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4A263E1-9F7C-4B0B-ACE4-4344A9B7AF92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4A263E1-9F7C-4B0B-ACE4-4344A9B7AF92}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB4BACF6-6167-46A1-93F5-F72AB5A56161}
+	EndGlobalSection
+EndGlobal
