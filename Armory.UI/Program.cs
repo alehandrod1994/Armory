@@ -1,3 +1,5 @@
+using Armory.UI.Forms;
+
 namespace Armory.UI
 {
     internal static class Program
@@ -11,7 +13,7 @@ namespace Armory.UI
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new DataForm());
+            Application.Run(new MainForm());
         }
     }
 }

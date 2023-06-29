@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Armory.BL.Configurations;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
@@ -27,6 +28,12 @@ namespace Armory.BL.Model
 		{
 			optionsBuilder.UseSqlite("Data Source=armory.db");
 		}
- 
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.ApplyConfiguration(new ActConfiguration());
+			modelBuilder.ApplyConfiguration(new AirportConfiguration());
+		}
+
 	}
 }

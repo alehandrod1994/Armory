@@ -20,6 +20,36 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\AddAct.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddWeaponType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddWeapon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddSecurityOfficer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddPosition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddPlane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddFlight.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddCrewMember.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\AddCity.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="armory.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

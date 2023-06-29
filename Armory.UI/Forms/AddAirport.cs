@@ -25,7 +25,7 @@ namespace Armory.UI
         public AddAirport(ArmoryContext db, Airport airport) : this(db)
         {           
             Airport = airport ?? new Airport();
-            tbName.Text = Airport.Name;
+            tbAirport.Text = Airport.Name;
         }
 
         public Airport? Airport { get; set; }
@@ -33,23 +33,21 @@ namespace Armory.UI
         private void BntSave_Click(object sender, EventArgs e)
         {
             // Проверка, чтобы все поля были заполнены:
-            List<Control> controls = Checker.CheckControlsOnNull(this);
+            List<Control> controls = Checker.CheckControlsOnNull(Controls);
             if (controls.Count > 0)
             {
-                foreach (Control control in controls)
-                {
-                    control.BackColor = Color.LightCoral;
-                }
-
-                MessageBox.Show("Заполните все поля.");
+                Checker.SetControlsToRed(controls);
+                MessageBox.Show("Неверно заполнены поля.");
                 return;
             }
-
-            // Проверка, есть ли в базе уже такой аэропорт:		
-            if (Checker.CheckOnDublicate(_db!.Airports, tbName.Text)) return;
+           
+            var city = new City() { Name = tbCity.Text };
+            city = DbHelper.EnsureHasItem(_db!.Cities, city);
 
             Airport ??= new Airport();
-            Airport.Name = tbName.Text;
+            Airport.Name = tbAirport.Text;
+            Airport.City = city;
+
             DialogResult = DialogResult.OK;
 
         }

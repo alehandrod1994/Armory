@@ -3,12 +3,27 @@ using System.Collections.Generic;
 
 namespace Armory.BL.Model
 {
-    public class WeaponType
-    {
+	public class WeaponType
+	{
 		public int ID { get; set; }
 		public string? Name { get; set; }
 		public List<Weapon> Weapons{ get; set; } = new();
 
-        public override string ToString() => Name!;
-    }
+		public override string ToString() => Name!;
+
+		//public override bool Equals(object? obj)
+		//{
+		//	if (obj is WeaponType weaponType)
+		//	{
+		//		return Name == weaponType.Name;
+		//	}
+
+		//	return false;
+		//}
+
+		//public override int GetHashCode()
+		//{
+		//	return Name!.GetHashCode();
+		//}
+	}
 }

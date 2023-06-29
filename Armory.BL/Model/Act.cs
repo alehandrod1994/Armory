@@ -11,8 +11,10 @@ namespace Armory.BL.Model
     {
         public int ID { get; set; }
         public int Number { get; set; }
-        public int AirportID { get; set; }
-        public Airport? Airport { get; set; }
+        public int DepartureAirportID { get; set; }
+        public Airport? DepartureAirport { get; set; }
+        public int ArrivalAirportID { get; set; }
+        public Airport? ArrivalAirport { get; set; }       
         public int WeaponID { get; set; }
         public Weapon? Weapon { get; set; }
         public string? WeaponRegistrationNumber { get; set; }
@@ -25,8 +27,6 @@ namespace Armory.BL.Model
         public string? AmmunitionBaggageTagNumber { get; set; }
         public int SecurityOfficerID { get; set; }
         public SecurityOfficer? SecurityOfficer { get; set; }
-        public int CityID { get; set; }
-        public City? City { get; set; }
         public int FlightID { get; set; }
         public Flight? Flight { get; set; }
         public int PlaneID { get; set; }
@@ -39,5 +39,20 @@ namespace Armory.BL.Model
         {
             return $"Акт №{Number} от {Date:dd.MM.yy}";
         }
+
+        //public override bool Equals(object? obj)
+        //{
+        //    if (obj is Act act)
+        //    {
+        //        return Number == act.Number && Date == act.Date;
+        //    }
+
+        //    return false;
+        //}
+
+        //public override int GetHashCode()
+        //{
+        //    return Number.GetHashCode();
+        //}
     }
 }

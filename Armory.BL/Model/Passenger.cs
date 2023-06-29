@@ -5,17 +5,17 @@ namespace Armory.BL.Model
 {
 	public class Passenger
 	{
-		public Passenger(string name, string surname, string patronymic, PassengerPassport passport)
+		public Passenger(string surname, string name, string patronymic, PassengerPassport passport)
 		{
-			if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(surname))
+            {
+                throw new ArgumentNullException(nameof(surname), "Фамилия пассажира не может быть пустой.");
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
 			{
 				throw new ArgumentNullException(nameof(name), "Имя пассажира не может быть пустым.");
-			}
-			
-			if (string.IsNullOrWhiteSpace(surname))
-			{
-				throw new ArgumentNullException(nameof(surname), "Фамилия пассажира не может быть пустой.");
-			}
+			}						
 			
 			if (string.IsNullOrWhiteSpace(patronymic))
 			{
@@ -26,15 +26,15 @@ namespace Armory.BL.Model
 			{
 				throw new ArgumentNullException(nameof(passport), "Паспорт пассажира не может быть пустым.");
 			}
-			
-			Name = name;
-			Surname = surname;
+
+            Surname = surname;
+            Name = name;			
 			Patronymic = patronymic;
 			Passport = passport;
 		}
-		
-		public string? Name { get; set; }
-		public string? Surname { get; set; }
+
+        public string? Surname { get; set; }
+        public string? Name { get; set; }		
 		public string? Patronymic { get; set; }
 		public PassengerPassport? Passport { get; set; }
 				

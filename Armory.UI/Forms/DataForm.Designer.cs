@@ -44,6 +44,7 @@
             this.btnChange = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.tableName = new System.Windows.Forms.Label();
+            this.btnImport = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.table)).BeginInit();
             this.SuspendLayout();
             // 
@@ -211,11 +212,22 @@
             this.tableName.TabIndex = 15;
             this.tableName.Text = "Название таблицы";
             // 
+            // btnImport
+            // 
+            this.btnImport.Location = new System.Drawing.Point(992, 90);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(75, 23);
+            this.btnImport.TabIndex = 16;
+            this.btnImport.Text = "Импорт";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.BtnImport_Click);
+            // 
             // DataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1247, 669);
+            this.Controls.Add(this.btnImport);
             this.Controls.Add(this.tableName);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnChange);
@@ -233,7 +245,9 @@
             this.Controls.Add(this.btnOpenAirports);
             this.Controls.Add(this.btnOpenActs);
             this.Name = "DataForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "DataForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DataForm_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.table)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -258,5 +272,6 @@
         private Button btnChange;
         private Button btnRemove;
         private Label tableName;
+        private Button btnImport;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Armory.BL.Model;
+﻿using Armory.BL.Controller;
+using Armory.BL.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Armory.UI.Commands
 {
-    public class AirportCommand : ICommand
+    public class AirportCommand : BaseCommand, ICommand
     {
         public void Add(ArmoryContext db)
         {
@@ -15,8 +16,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Airports.Add(form.Airport!);
-                db.SaveChanges();
-                MessageBox.Show("Данные успешно сохранены.");
+                SaveChanges(db, "Данные успешно сохранены.");
             }
 
         }
@@ -28,19 +28,39 @@ namespace Armory.UI.Commands
                 var form = new AddAirport(db, airport);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    db.SaveChanges();
-                    MessageBox.Show("Данные успешно изменены.");
+                    SaveChanges(db, "Данные успешно изменены.");
                 }
             }
-        }
+        }      
 
         public void Remove(ArmoryContext db, int id)
         {
             if (db.Airports.Find(id) is Airport airport)
             {
                 db.Airports.Remove(airport);
-                db.SaveChanges();
-                MessageBox.Show("Данные успешно удалены.");
+                SaveChanges(db, "Данные успешно удалены.");
+            }
+        }
+
+        public void Import(ArmoryContext db)
+        {
+            string path = ImportDataFromExcel();
+
+            if (path != "")
+            {
+                var integrator = new Integrator(db, path);
+                List<Airport>? airports = integrator.ImportAirportData();
+
+                if (airports != null)
+                {
+                    db.Airports.AddRange(airports);
+                    SaveChanges(db, "Данные успешно добавлены.");
+                }
+                else
+                {
+                    var messageController = new MessageController();
+                    MessageBox.Show(messageController.GetMessage(integrator.Result));
+                }
             }
         }
     }

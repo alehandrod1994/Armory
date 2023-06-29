@@ -23,9 +23,6 @@ namespace Armory.BL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AirportID")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("AmmunitionBaggageTagNumber")
                         .HasColumnType("TEXT");
 
@@ -38,7 +35,7 @@ namespace Armory.BL.Migrations
                     b.Property<double>("AmmunitionWeight")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("CityID")
+                    b.Property<int>("ArrivalAirportID")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("CrewMemberID")
@@ -46,6 +43,9 @@ namespace Armory.BL.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("DepartureAirportID")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("FlightID")
                         .HasColumnType("INTEGER");
@@ -73,13 +73,13 @@ namespace Armory.BL.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("AirportID");
-
                     b.HasIndex("AmmunitionID");
 
-                    b.HasIndex("CityID");
+                    b.HasIndex("ArrivalAirportID");
 
                     b.HasIndex("CrewMemberID");
+
+                    b.HasIndex("DepartureAirportID");
 
                     b.HasIndex("FlightID");
 
@@ -98,10 +98,15 @@ namespace Armory.BL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("CityID")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("CityID");
 
                     b.ToTable("Airports");
                 });
@@ -244,28 +249,28 @@ namespace Armory.BL.Migrations
 
             modelBuilder.Entity("Armory.BL.Model.Act", b =>
                 {
-                    b.HasOne("Armory.BL.Model.Airport", "Airport")
-                        .WithMany()
-                        .HasForeignKey("AirportID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Armory.BL.Model.Ammunition", "Ammunition")
                         .WithMany("Acts")
                         .HasForeignKey("AmmunitionID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Armory.BL.Model.City", "City")
-                        .WithMany("Acts")
-                        .HasForeignKey("CityID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Armory.BL.Model.Airport", "ArrivalAirport")
+                        .WithMany("ActsForArrival")
+                        .HasForeignKey("ArrivalAirportID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Armory.BL.Model.CrewMember", "CrewMember")
                         .WithMany("Acts")
                         .HasForeignKey("CrewMemberID")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Armory.BL.Model.Airport", "DepartureAirport")
+                        .WithMany("ActsForDeparture")
+                        .HasForeignKey("DepartureAirportID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Armory.BL.Model.Flight", "Flight")
@@ -292,13 +297,13 @@ namespace Armory.BL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Airport");
-
                     b.Navigation("Ammunition");
 
-                    b.Navigation("City");
+                    b.Navigation("ArrivalAirport");
 
                     b.Navigation("CrewMember");
+
+                    b.Navigation("DepartureAirport");
 
                     b.Navigation("Flight");
 
@@ -307,6 +312,17 @@ namespace Armory.BL.Migrations
                     b.Navigation("SecurityOfficer");
 
                     b.Navigation("Weapon");
+                });
+
+            modelBuilder.Entity("Armory.BL.Model.Airport", b =>
+                {
+                    b.HasOne("Armory.BL.Model.City", "City")
+                        .WithMany("Airports")
+                        .HasForeignKey("CityID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("Armory.BL.Model.SecurityOfficer", b =>
@@ -331,6 +347,13 @@ namespace Armory.BL.Migrations
                     b.Navigation("Type");
                 });
 
+            modelBuilder.Entity("Armory.BL.Model.Airport", b =>
+                {
+                    b.Navigation("ActsForArrival");
+
+                    b.Navigation("ActsForDeparture");
+                });
+
             modelBuilder.Entity("Armory.BL.Model.Ammunition", b =>
                 {
                     b.Navigation("Acts");
@@ -338,7 +361,7 @@ namespace Armory.BL.Migrations
 
             modelBuilder.Entity("Armory.BL.Model.City", b =>
                 {
-                    b.Navigation("Acts");
+                    b.Navigation("Airports");
                 });
 
             modelBuilder.Entity("Armory.BL.Model.CrewMember", b =>
