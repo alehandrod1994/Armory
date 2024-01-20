@@ -13,16 +13,17 @@ namespace Armory.BL.Model
     {
         private readonly ArmoryContext? _db;
 
-        public Integrator(ArmoryContext db, string path)
+        public Integrator(ArmoryContext db)
         {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                throw new ArgumentNullException(nameof(path), "Путь файла не может быть пустым.");
-            }
-
-            Path = path;
             _db = db;
+
+            SheetNumber = 1;
+            StartRow = 2;
         }
+
+        public int SheetNumber { get; set; }
+        public int StartRow { get; set; }
+
 
         private int GetColumnIndex(string columnName)
         {
@@ -37,10 +38,128 @@ namespace Armory.BL.Model
             return 0;
         }
 
-        public List<Act>? ImportActData()
+        public ArmoryContext? ImportAll()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            // TODO: Сделать порядок добавления как в AddAct.
+            // TODO: Импортировать по названию листа или номеру.
+            // TODO: Если такой страницы нет.
+
+            SheetNumber = 4;
+            List<City>? cities = ImportCitiesData();
+
+            if (cities != null)
+            {
+                _db!.Cities.AddRange(cities);
+            }
+
+            SheetNumber = 2;
+            List<Airport>? airports = ImportAirportsData();
+
+            if (airports != null)
+            {
+                _db!.Airports.AddRange(airports);
+            }
+
+            SheetNumber = 8;
+            List<Position>? positions = ImportPositionsData();
+
+            if (positions != null)
+            {
+                _db!.Positions.AddRange(positions);
+            }
+
+            SheetNumber = 9;
+            List<SecurityOfficer>? securityOfficers = ImportSecurityOfficersData();
+
+            if (securityOfficers != null)
+            {
+                _db!.SecurityOfficers.AddRange(securityOfficers);
+            }
+
+            SheetNumber = 6;
+            List<Flight>? flights = ImportFlightsData();
+
+            if (flights != null)
+            {
+                _db!.Flights.AddRange(flights);
+            }
+
+            SheetNumber = 7;
+            List<Plane>? planes = ImportPlanesData();
+
+            if (planes != null)
+            {
+                _db!.Planes.AddRange(planes);
+            }
+
+            SheetNumber = 5;
+            List<CrewMember>? crewMembers = ImportCrewMembersData();
+
+            if (crewMembers != null)
+            {
+                _db!.CrewMembers.AddRange(crewMembers);
+            }
+
+            SheetNumber = 11;
+            List<WeaponType>? weaponTypes = ImportWeaponTypesData();
+
+            if (weaponTypes != null)
+            {
+                _db!.WeaponTypes.AddRange(weaponTypes);
+            }
+
+            SheetNumber = 10;
+            List<Weapon>? weapons = ImportWeaponsData();
+
+            if (weapons != null)
+            {
+                _db!.Weapons.AddRange(weapons);
+            }
+
+            SheetNumber = 3;
+            List<Ammunition>? ammunitions = ImportAmmunitionsData();
+
+            if (ammunitions != null)
+            {
+                _db!.Ammunitions.AddRange(ammunitions);
+            }
+
+            SheetNumber = 1;
+            List<Act>? acts = ImportActsData();
+
+            if (acts != null)
+            {
+                _db!.Acts.AddRange(acts);
+            }
+
+            if (acts == null && airports == null && ammunitions == null && cities == null
+            && crewMembers == null && flights == null && planes == null && positions == null
+            && securityOfficers == null && weapons == null && weaponTypes == null)
+            {
+                CloseConnection();
+                Result = MessageResult.NotSaved;
+                return _db;
+            }        
+
+            CloseConnection();
+            Result = MessageResult.Imported;
+            return _db;
+        }
+
+        private List<Act>? ImportActsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
@@ -71,13 +190,15 @@ namespace Armory.BL.Model
             ammunitionWeightColumn == 0 || ammunitionBaggageTagNumberColumn == 0 || securityOfficerColumn == 0 ||
             flightColumn == 0 || planeColumn == 0 || crewMemberColumn == 0 || dateColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var acts = new List<Act>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
+                if (CheckSheetEnd(i, numberColumn)) break;
+
                 var departureCity = new City() { Name = ToString(i, departureCityColumn) };
                 departureCity = DbHelper.EnsureHasItem(_db!.Cities, departureCity);
 
@@ -161,21 +282,38 @@ namespace Armory.BL.Model
                     CrewMember = crewMember,
                     Date = (DateTime)date,
                 };
-                acts.Add(act);
-
-
-                if (CheckSheetEnd(i, numberColumn)) break;
+                acts.Add(act);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return acts;
         }
 
-        public List<Airport>? ImportAirportData()
+        public List<Act>? ImportActs()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<Act>? acts = ImportActsData();
+            if (acts != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return acts;
+        }
+
+        private List<Airport>? ImportAirportsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
@@ -184,13 +322,15 @@ namespace Armory.BL.Model
 
             if (nameColumn == 0 || cityColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var airports = new List<Airport>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
+                if (CheckSheetEnd(i, nameColumn)) break;
+
                 var city = new City() { Name = ToString(i, cityColumn) };
                 city = DbHelper.EnsureHasItem(_db!.Cities, city);
 
@@ -199,188 +339,326 @@ namespace Armory.BL.Model
                     Name = ToString(i, nameColumn),
                     City = city
                 };
-                airports.Add(airport);
-
-                if (CheckSheetEnd(i, nameColumn)) break;
+                airports.Add(airport);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return airports;
         }
 
-        public List<Ammunition>? ImportAmmunitionData()
+        public List<Airport>? ImportAirports()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<Airport>? airports = ImportAirportsData();
+            if (airports != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return airports;
+        }
+
+        private List<Ammunition>? ImportAmmunitionsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
             int typeColumn = GetColumnIndex("ТИП");
             if (typeColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var ammunitions = new List<Ammunition>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var ammunition = new Ammunition() { Type = ToString(i, typeColumn) };
-                ammunitions.Add(ammunition);
-
                 if (CheckSheetEnd(i, typeColumn)) break;
+
+                var ammunition = new Ammunition() { Type = ToString(i, typeColumn) };
+                ammunitions.Add(ammunition);                
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return ammunitions;
         }
 
-        public List<City>? ImportCityData()
+        public List<Ammunition>? ImportAmmunitions()
         {
             if (!OpenConnection())
             {
                 return null;
             }
+
+            List<Ammunition>? ammunitions = ImportAmmunitionsData();
+            if (ammunitions != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return ammunitions;
+        }
+
+        private List<City>? ImportCitiesData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
+                return null;
+            }           
 
             int nameColumn = GetColumnIndex("ГОРОД");
             if (nameColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var cities = new List<City>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var city = new City() { Name = ToString(i, nameColumn) };
-                cities.Add(city);
-
                 if (CheckSheetEnd(i, nameColumn)) break;
+
+                var city = new City() { Name = ToString(i, nameColumn) };
+                cities.Add(city);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return cities;
         }
 
-        public List<CrewMember>? ImportCrewMemberData()
+        public List<City>? ImportCities()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<City>? cities = ImportCitiesData();
+            if (cities != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return cities;
+        }
+
+        private List<CrewMember>? ImportCrewMembersData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
             int nameColumn = GetColumnIndex("ФИО");
             if (nameColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var crewMembers = new List<CrewMember>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var crewMember = new CrewMember() { Name = ToString(i, nameColumn) };
-                crewMembers.Add(crewMember);
-
                 if (CheckSheetEnd(i, nameColumn)) break;
+
+                var crewMember = new CrewMember() { Name = ToString(i, nameColumn) };
+                crewMembers.Add(crewMember);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return crewMembers;
         }
 
-        public List<Flight>? ImportFlightData()
+        public List<CrewMember>? ImportCrewMembers()
         {
             if (!OpenConnection())
             {
                 return null;
             }
 
+            List<CrewMember>? crewMembers = ImportCrewMembersData();
+            if (crewMembers != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return crewMembers;
+        }
+
+        private List<Flight>? ImportFlightsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
+                return null;
+            }
+
             int numberColumn = GetColumnIndex("НОМЕР");
             if (numberColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var flights = new List<Flight>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var flight = new Flight() { Number = ToString(i, numberColumn) };
-                flights.Add(flight);
-
                 if (CheckSheetEnd(i, numberColumn)) break;
+
+                var flight = new Flight() { Number = ToString(i, numberColumn) };
+                flights.Add(flight);                
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return flights;
         }
 
-        public List<Plane>? ImportPlaneData()
+        public List<Flight>? ImportFlights()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<Flight>? flights = ImportFlightsData();
+            if (flights != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return flights;
+        }
+
+        private List<Plane>? ImportPlanesData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
             int numberColumn = GetColumnIndex("НОМЕР");
             if (numberColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var planes = new List<Plane>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var plane = new Plane() { Number = ToString(i, numberColumn) };
-                planes.Add(plane);
-
                 if (CheckSheetEnd(i, numberColumn)) break;
+
+                var plane = new Plane() { Number = ToString(i, numberColumn) };
+                planes.Add(plane);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return planes;
         }
 
-        public List<Position>? ImportPositionData()
+        public List<Plane>? ImportPlanes()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<Plane>? planes = ImportPlanesData();
+            if (planes != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return planes;
+        }
+
+        private List<Position>? ImportPositionsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
             int nameColumn = GetColumnIndex("ДОЛЖНОСТЬ");
             if (nameColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var positions = new List<Position>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var position = new Position() { Name = ToString(i, nameColumn) };
-                positions.Add(position);
-
                 if (CheckSheetEnd(i, nameColumn)) break;
+
+                var position = new Position() { Name = ToString(i, nameColumn) };
+                positions.Add(position);             
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return positions;
         }
 
-        public List<SecurityOfficer>? ImportSecurityOfficerData()
+        public List<Position>? ImportPositions()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<Position>? positions = ImportPositionsData();
+            if (positions != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return positions;
+        }
+
+        private List<SecurityOfficer>? ImportSecurityOfficersData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
@@ -389,13 +667,15 @@ namespace Armory.BL.Model
 
             if (nameColumn == 0 || positionColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var securityOfficers = new List<SecurityOfficer>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
+                if (CheckSheetEnd(i, nameColumn)) break;
+
                 var position = new Position() { Name = ToString(i, positionColumn) };
                 position = DbHelper.EnsureHasItem(_db!.Positions, position);
 
@@ -404,20 +684,38 @@ namespace Armory.BL.Model
                     Name = ToString(i, nameColumn),
                     Position = position
                 };
-                securityOfficers.Add(securityOfficer);
-
-                if (CheckSheetEnd(i, nameColumn)) break;
+                securityOfficers.Add(securityOfficer);                
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return securityOfficers;
         }
 
-        public List<Weapon>? ImportWeaponData()
+        public List<SecurityOfficer>? ImportSecurityOfficers()
         {
             if (!OpenConnection())
             {
+                return null;
+            }
+
+            List<SecurityOfficer>? securityOfficers = ImportSecurityOfficersData();
+            if (securityOfficers != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return securityOfficers;
+        }
+
+        private List<Weapon>? ImportWeaponsData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
                 return null;
             }
 
@@ -426,13 +724,15 @@ namespace Armory.BL.Model
 
             if (modelColumn == 0 || typeColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var weapons = new List<Weapon>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
+                if (CheckSheetEnd(i, modelColumn)) break;
+
                 var type = new WeaponType() { Name = ToString(i, typeColumn) };
                 type = DbHelper.EnsureHasItem(_db!.WeaponTypes, type);
 
@@ -441,43 +741,76 @@ namespace Armory.BL.Model
                     Model = ToString(i, modelColumn),
                     Type = type
                 };
-                weapons.Add(weapon);
-
-                if (CheckSheetEnd(i, modelColumn)) break;
+                weapons.Add(weapon);               
             }
 
-            CloseConnection();
-            Result = DocumentResult.Added;
             return weapons;
         }
 
-        public List<WeaponType>? ImportWeaponTypeData()
+        public List<Weapon>? ImportWeapons()
         {
             if (!OpenConnection())
             {
                 return null;
             }
 
+            List<Weapon>? weapons = ImportWeaponsData();
+            if (weapons != null)
+            {
+                Result = MessageResult.Imported;
+            }
+
+            CloseConnection();
+            return weapons;
+        }
+
+        private List<WeaponType>? ImportWeaponTypesData()
+        {
+            if (book!.Sheets.Count >= SheetNumber)
+            {
+                sheet = book!.Sheets[SheetNumber];
+            }
+            else
+            {
+                Result = MessageResult.NoSheet;
+                return null;
+            }
+
             int nameColumn = GetColumnIndex("ТИП");
             if (nameColumn == 0)
             {
-                Result = DocumentResult.UnknownData;
+                Result = MessageResult.UnknownData;
                 return null;
             }
 
             var types = new List<WeaponType>();
-            for (int i = 2; i < 10000; i++)
+            for (int i = StartRow; i < 10000; i++)
             {
-                var type = new WeaponType() { Name = ToString(i, nameColumn) };
-                types.Add(type);
-
                 if (CheckSheetEnd(i, nameColumn)) break;
+
+                var type = new WeaponType() { Name = ToString(i, nameColumn) };
+                types.Add(type);                
+            }
+
+            return types;
+        }
+
+        public List<WeaponType>? ImportWeaponTypes()
+        {
+            if (!OpenConnection())
+            {
+                return null;
+            }
+
+            List<WeaponType>? types = ImportWeaponTypesData();
+            if (types != null)
+            {
+                Result = MessageResult.Imported;
             }
 
             CloseConnection();
-            Result = DocumentResult.Added;
             return types;
-        }        
+        }               
     }
 }
 

@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.CrewMembers.Add(form.CrewMember!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddCrewMember(db, crewMember);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.CrewMembers.Find(id) is CrewMember crewMember)
-            {
-                db.CrewMembers.Remove(crewMember);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
+            //if (db.CrewMembers.Find(ids) is CrewMember crewMember)
+            //{
+            //    db.CrewMembers.Remove(crewMember);
+            //    SaveChanges(db, "Данные успешно удалены.");
+            //}
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //List<CrewMember>? crewMembers = integrator.ImportCrewMembers();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<CrewMember>? crewMembers = integrator.ImportCrewMemberData();
-
-                if (crewMembers != null)
-                {
-                    db.CrewMembers.AddRange(crewMembers);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (crewMembers != null)
+            //{
+            //    db.CrewMembers.AddRange(crewMembers);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

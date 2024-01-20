@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.WeaponTypes.Add(form.WeaponType!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddWeaponType(db, weaponType);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.WeaponTypes.Find(id) is WeaponType weaponType)
-            {
-                db.WeaponTypes.Remove(weaponType);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
+            //if (db.WeaponTypes.Find(ids) is WeaponType weaponType)
+            //{
+            //    db.WeaponTypes.Remove(weaponType);
+            //    SaveChanges(db, "Данные успешно удалены.");
+            //}
         }
 
-        public void Import(ArmoryContext db)
-        {
-            string path = ImportDataFromExcel();
+        public void Import(ArmoryContext db, Integrator integrator)
+        {           
+            //List<WeaponType>? weaponTypes = integrator.ImportWeaponTypes();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<WeaponType>? types = integrator.ImportWeaponTypeData();
-
-                if (types != null)
-                {
-                    db.WeaponTypes.AddRange(types);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (weaponTypes != null)
+            //{
+            //    db.WeaponTypes.AddRange(weaponTypes);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.SecurityOfficers.Add(form.SecurityOfficer!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddSecurityOfficer(db, securityOfficer);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.SecurityOfficers.Find(id) is SecurityOfficer securityOfficer)
-            {
-                db.SecurityOfficers.Remove(securityOfficer);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
+            //if (db.SecurityOfficers.Find(ids) is SecurityOfficer securityOfficer)
+            //{
+            //    db.SecurityOfficers.Remove(securityOfficer);
+            //    SaveChanges(db, "Данные успешно удалены.");
+            //}
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //List<SecurityOfficer>? securityOfficers = integrator.ImportSecurityOfficers();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<SecurityOfficer>? securityOfficers = integrator.ImportSecurityOfficerData();
-
-                if (securityOfficers != null)
-                {
-                    db.SecurityOfficers.AddRange(securityOfficers);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (securityOfficers != null)
+            //{
+            //    db.SecurityOfficers.AddRange(securityOfficers);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

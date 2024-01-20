@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Cities.Add(form.City!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,63 @@ namespace Armory.UI.Commands
                 var form = new AddCity(db, city);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.Cities.Find(id) is City city)
-            {
-                db.Cities.Remove(city);
-                SaveChanges(db, "Данные успешно удалены.");
+            if (db.Cities.Find(ids[0]) is City)
+            {             
+                List<City> cities = new();
+
+                foreach (int id in ids)
+                {
+                    cities.Add(db.Cities.Find(id)!);
+                }
+
+                db.Cities.RemoveRange(cities);
+                SaveChanges(db);              
             }
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //string path = ImportDataFromExcel();
 
-            if (path != "")
+            //if (path != "")
+            //{
+            //    var integrator = new Integrator(db, path);
+            //    List<City>? cities = integrator.ImportCities();
+
+            //    if (cities != null)
+            //    {
+            //        db.Cities.AddRange(cities);
+            //        SaveChanges(db, "Данные успешно добавлены.");
+            //    }
+            //    else
+            //    {
+            //        var messageController = new MessageController();
+            //        MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //    }
+            //}
+
+
+            List<City>? cities = integrator.ImportCities();
+
+            if (cities != null)
             {
-                var integrator = new Integrator(db, path);
-                List<City>? cities = integrator.ImportCityData();
-
-                if (cities != null)
-                {
-                    db.Cities.AddRange(cities);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
+                db.Cities.AddRange(cities);
+                SaveChanges(db);
+                MessageBox.Show("Данные успешно добавлены");
             }
+            else
+            {
+                var messageController = new MessageController();
+                MessageBox.Show(messageController.GetMessage(integrator.Result));
+            }   
+
         }
     }
 }

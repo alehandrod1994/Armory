@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Armory.BL.Model
 {
 	public class City
 	{
 		public int ID { get; set; }
-		public string? Name { get; set; }
-		public List<Airport> Airports { get; set; } = new();
+
+        [DisplayName("Имя")]
+        public string? Name { get; set; }
+        public List<Airport> Airports { get; set; } = new();
 
 		public override string ToString() => Name!;
 

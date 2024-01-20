@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Ammunitions.Add(form.Ammunition!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddAmmunition(db, ammunition);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.Ammunitions.Find(id) is Ammunition ammunition)
+            if (db.Ammunitions.Find(ids) is Ammunition ammunition)
             {
                 db.Ammunitions.Remove(ammunition);
-                SaveChanges(db, "Данные успешно удалены.");
+                SaveChanges(db);
             }
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //List<Ammunition>? ammunitions = integrator.ImportAmmunitions();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<Ammunition>? ammunitions = integrator.ImportAmmunitionData();
-
-                if (ammunitions != null)
-                {
-                    db.Ammunitions.AddRange(ammunitions);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (ammunitions != null)
+            //{
+            //    db.Ammunitions.AddRange(ammunitions);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

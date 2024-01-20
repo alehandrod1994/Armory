@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 namespace Armory.BL.Model
@@ -7,7 +8,9 @@ namespace Armory.BL.Model
 	public class Plane
 	{
 		public int ID { get; set; }
-		public string? Number { get; set; }
+
+        [DisplayName("Номер")]
+        public string? Number { get; set; }
 
 		public override string ToString() => Number!;
 

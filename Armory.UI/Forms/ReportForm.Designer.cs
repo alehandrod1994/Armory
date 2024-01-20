@@ -99,6 +99,7 @@
             this.label29 = new System.Windows.Forms.Label();
             this.panelSave = new System.Windows.Forms.Panel();
             this.btnTest = new System.Windows.Forms.Button();
+            this.btnPrevious = new System.Windows.Forms.Button();
             this.panelMain.SuspendLayout();
             this.panelEmployees.SuspendLayout();
             this.panelPassenger.SuspendLayout();
@@ -232,7 +233,7 @@
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(100, 23);
             this.btnNext.TabIndex = 25;
-            this.btnNext.Text = "Далее";
+            this.btnNext.Text = "Далее>";
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.BtnNext_Click);
             // 
@@ -480,7 +481,7 @@
             // 
             // btnClear
             // 
-            this.btnClear.Location = new System.Drawing.Point(737, 621);
+            this.btnClear.Location = new System.Drawing.Point(587, 621);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(84, 23);
             this.btnClear.TabIndex = 29;
@@ -784,11 +785,22 @@
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // btnPrevious
+            // 
+            this.btnPrevious.Location = new System.Drawing.Point(782, 621);
+            this.btnPrevious.Name = "btnPrevious";
+            this.btnPrevious.Size = new System.Drawing.Size(100, 23);
+            this.btnPrevious.TabIndex = 33;
+            this.btnPrevious.Text = "<Назад";
+            this.btnPrevious.UseVisualStyleBackColor = true;
+            this.btnPrevious.Click += new System.EventHandler(this.BtnPrevious_Click);
+            // 
             // ReportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1247, 669);
+            this.Controls.Add(this.btnPrevious);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.panelProgress);
@@ -897,5 +909,6 @@
         private Button btnReportAct;
         private Panel panelSave;
         private Button btnTest;
+        private Button btnPrevious;
     }
 }

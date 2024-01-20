@@ -1,5 +1,6 @@
 ﻿using Armory.BL.Controller;
 using Armory.BL.Model;
+using Armory.UI.Forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Airports.Add(form.Airport!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
 
         }
@@ -28,40 +29,51 @@ namespace Armory.UI.Commands
                 var form = new AddAirport(db, airport);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
-                }
-            }
-        }      
-
-        public void Remove(ArmoryContext db, int id)
-        {
-            if (db.Airports.Find(id) is Airport airport)
-            {
-                db.Airports.Remove(airport);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
-        }
-
-        public void Import(ArmoryContext db)
-        {
-            string path = ImportDataFromExcel();
-
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<Airport>? airports = integrator.ImportAirportData();
-
-                if (airports != null)
-                {
-                    db.Airports.AddRange(airports);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
+                    SaveChanges(db);
                 }
             }
         }
+
+        public void Remove(ArmoryContext db, List<int> ids)
+        {
+            if (db.Airports.Find(ids[0]) is Airport)
+            {
+                List<Airport> airports = new();
+
+                foreach (int id in ids)
+                {
+                    airports.Add(db.Airports.Find(id)!);
+                }
+
+                db.Airports.RemoveRange(airports);
+                SaveChanges(db);              
+            }
+        }
+
+        public void Import(ArmoryContext db, Integrator integrator)
+        {
+            //Dictionary<string, string> airportColumns = new()
+            //{
+            //    {"Name", "Аэропорт"},
+            //    {"City", "Город"}
+            //};
+
+
+            List<Airport>? airports = integrator.ImportAirports();
+
+            if (airports != null)
+            {
+                db.Airports.AddRange(airports);
+                SaveChanges(db);
+                MessageBox.Show("Данные успешно добавлены");
+            }
+            else
+            {
+                var messageController = new MessageController();
+                MessageBox.Show(messageController.GetMessage(integrator.Result));
+            }
+            
+        }
+
     }
 }

@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Planes.Add(form.Plane!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddPlane(db, plane);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.Planes.Find(id) is Plane plane)
-            {
-                db.Planes.Remove(plane);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
+            //if (db.Planes.Find(ids) is Plane plane)
+            //{
+            //    db.Planes.Remove(plane);
+            //    SaveChanges(db, "Данные успешно удалены.");
+            //}
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //List<Plane>? planes = integrator.ImportPlanes();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<Plane>? planes = integrator.ImportPlaneData();
-
-                if (planes != null)
-                {
-                    db.Planes.AddRange(planes);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (planes != null)
+            //{
+            //    db.Planes.AddRange(planes);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

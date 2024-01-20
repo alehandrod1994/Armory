@@ -41,9 +41,6 @@ namespace Armory.UI.Forms
 			Location = new Point(x, y);
 
 			CreateNewReport();
-
-   
-
 		}
 
 		private void ReportForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -105,10 +102,7 @@ namespace Armory.UI.Forms
         }
 
         private void CreateNewReport()
-		{
-			_currentTabNumber = 1;
-			_maxTabNumber = 7;
-
+		{		
 			_tabs = new List<Tab>()
 			{
 				new Tab(1, "Основная", panelMain),
@@ -120,8 +114,13 @@ namespace Armory.UI.Forms
 				new Tab(7, "Сохранение", panelSave)
 			};
 
-			panelProgress.Invalidate();
-			btnNext.Visible = true;
+            _currentTabNumber = 1;
+            _maxTabNumber = _tabs.Count;
+            OpenTab(_currentTabNumber);
+
+            panelProgress.Invalidate();
+            btnPrevious.Enabled = false;
+			btnNext.Enabled = true;
 
 			ClearAllData();
 
@@ -264,26 +263,44 @@ namespace Armory.UI.Forms
 
         private void OpenTab(int tabNumber)
 		{
-			Tab tab = _tabs![tabNumber - 1];
-			Panel panel = tab.Panel;
-			panel.BringToFront();
-			panel.Show();
+            if (tabNumber > _maxTabNumber)
+            {
+                return;
+            }
 
-			title.Text = tab.Name;
-		}
+            Tab tab = _tabs![tabNumber - 1];
+            Panel panel = tab.Panel;
+            panel.BringToFront();
+            panel.Show();
 
-		private void BtnNext_Click(object sender, EventArgs e)
-		{
+            title.Text = tab.Name;
+            panelProgress.Invalidate();
+
+            btnPrevious.Enabled = true;
+            btnNext.Enabled = true;
+
+            if (_currentTabNumber == 1)
+            {
+                btnPrevious.Enabled = false;
+            }
+
+            if (_currentTabNumber == _maxTabNumber)
+            {
+                btnNext.Enabled = false;
+            }
+        }
+
+        private bool CheckTabControls()
+        {
             Panel panel = _tabs![_currentTabNumber - 1].Panel;
 
             Checker.SetControlsToWhite(panel.Controls);
-
             List<Control> controls = Checker.CheckControlsOnNull(panel.Controls);
 
             switch (_currentTabNumber)
             {
                 case 1:
-                    controls.AddRange(Checker.ParseIntControls(new List<Control>() { tbActNumber}));
+                    controls.AddRange(Checker.ParseIntControls(new List<Control>() { tbActNumber }));
                     break;
 
                 case 3:
@@ -291,8 +308,8 @@ namespace Armory.UI.Forms
                     break;
 
                 case 6:
-                    controls.AddRange(Checker.ParseIntControls(new List<Control>() { tbAmmunitionCount}));
-                    controls.AddRange(Checker.ParseDoubleControls(new List<Control>() { tbAmmunitionWeight}));
+                    controls.AddRange(Checker.ParseIntControls(new List<Control>() { tbAmmunitionCount }));
+                    controls.AddRange(Checker.ParseDoubleControls(new List<Control>() { tbAmmunitionWeight }));
                     break;
 
                 default:
@@ -303,19 +320,26 @@ namespace Armory.UI.Forms
             {
                 Checker.SetControlsToRed(controls);
                 MessageBox.Show("Неверно заполнены поля.");
-                return;
+                return false;
+            }           
+           
+            return true;
+        }
+
+        private void BtnPrevious_Click(object sender, EventArgs e)
+        {
+            _currentTabNumber--;
+            OpenTab(_currentTabNumber);          
+        }
+
+        private void BtnNext_Click(object sender, EventArgs e)
+		{
+            if (CheckTabControls())
+            {
+                _currentTabNumber++;
+                OpenTab(_currentTabNumber);
             }
-
-            _currentTabNumber++;
-			OpenTab(_currentTabNumber);
-			panelProgress.Invalidate();
-
-			if (_currentTabNumber == _maxTabNumber)
-			{
-				btnNext.Visible = false;
-			}
-
-		}
+        }
 
 		private void ReportForm_Paint(object sender, PaintEventArgs e)
 		{
@@ -437,7 +461,7 @@ namespace Armory.UI.Forms
             };
 
             var report = new Report();
-            DocumentResult result = report.ReportAct(act, passenger);
+            MessageResult result = report.ReportAct(act, passenger);
             ShowExportResult(act, result, report.NewFilePath!);
         }
 
@@ -519,7 +543,7 @@ namespace Armory.UI.Forms
             };
 
             var report = new Report();
-            DocumentResult result = report.ReportAct(act, passenger);
+            MessageResult result = report.ReportAct(act, passenger);
             ShowExportResult(act, result, report.NewFilePath!);
         }
 
@@ -530,19 +554,19 @@ namespace Armory.UI.Forms
             //    Print();
         }
 
-        private void ShowExportResult(Act act, DocumentResult result, string newFileName)
+        private void ShowExportResult(Act act, MessageResult result, string newFileName)
         {          
             switch (result)
             {
-                case DocumentResult.FailedConnection:
+                case MessageResult.FailedConnection:
                     MessageBox.Show("Не удалось открыть подключение к файлу.");
                     break;
 
-                case DocumentResult.NotSaved:
+                case MessageResult.NotSaved:
                     MessageBox.Show("Не удалось сохранить файл.");
                     break;
 
-                case DocumentResult.Saved:
+                case MessageResult.Saved:
                     MessageBox.Show("Успешно.");
                     _db!.Acts.Add(act);
                     _db!.SaveChanges();
@@ -551,5 +575,7 @@ namespace Armory.UI.Forms
                     break;
             }
         }
+
+       
     }
 }

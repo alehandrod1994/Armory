@@ -10,7 +10,7 @@ namespace Armory.BL.Model
     {
         void Add(ArmoryContext db);
         void Change(ArmoryContext db, int id);
-        void Remove(ArmoryContext db, int id);
-        void Import(ArmoryContext db);
+        void Remove(ArmoryContext db, List<int> ids);
+        void Import(ArmoryContext db, Integrator integrator);
     }
 }

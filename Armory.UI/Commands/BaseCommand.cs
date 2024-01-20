@@ -9,12 +9,11 @@ namespace Armory.UI.Commands
 {
     public abstract class BaseCommand
     {
-        protected static void SaveChanges(ArmoryContext db, string message)
+        protected static void SaveChanges(ArmoryContext db)
         {
             try 
             {
                 db.SaveChanges();
-                MessageBox.Show(message);
             }
             catch
             {

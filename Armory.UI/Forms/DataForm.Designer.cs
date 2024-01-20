@@ -160,17 +160,19 @@
             // 
             // table
             // 
+            this.table.AllowDrop = true;
             this.table.AllowUserToAddRows = false;
             this.table.AllowUserToDeleteRows = false;
             this.table.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.table.Location = new System.Drawing.Point(401, 124);
-            this.table.MultiSelect = false;
             this.table.Name = "table";
             this.table.ReadOnly = true;
             this.table.RowTemplate.Height = 25;
             this.table.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.table.Size = new System.Drawing.Size(666, 313);
             this.table.TabIndex = 11;
+            this.table.DragDrop += new System.Windows.Forms.DragEventHandler(this.Table_DragDrop);
+            this.table.DragEnter += new System.Windows.Forms.DragEventHandler(this.Table_DragEnter);
             // 
             // btnAdd
             // 

@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Acts.Add(form.Act!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,39 +28,41 @@ namespace Armory.UI.Commands
                 var form = new AddAct(db, act);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
      
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.Acts.Find(id) is Act act)
+            if (db.Acts.Find(ids[0]) is Act)
             {
-                db.Acts.Remove(act);
-                SaveChanges(db, "Данные успешно удалены.");
+                List<Act> acts = new();
+
+                foreach (int id in ids)
+                {
+                    acts.Add(db.Acts.Find(id)!);
+                }
+
+                db.Acts.RemoveRange(acts);
+                SaveChanges(db);
             }
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            List<Act>? acts = integrator.ImportActs();
 
-            if (path != "")
+            if (acts != null)
             {
-                var integrator = new Integrator(db, path);
-                List<Act>? acts = integrator.ImportActData();
-
-                if (acts != null)
-                {
-                    db.Acts.AddRange(acts);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
+                db.Acts.AddRange(acts);
+                SaveChanges(db);
+                MessageBox.Show("Данные успешно добавлены");
+            }
+            else
+            {
+                var messageController = new MessageController();
+                MessageBox.Show(messageController.GetMessage(integrator.Result));
             }
         }
     }

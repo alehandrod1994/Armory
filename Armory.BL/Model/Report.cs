@@ -25,7 +25,7 @@ namespace Armory.BL.Model
         public string? NewFilePath { get; private set; }
        
 	
-        public DocumentResult ReportAct(Act act, Passenger passenger)
+        public MessageResult ReportAct(Act act, Passenger passenger)
 		{
 			if (!OpenConnection())
 			{
@@ -41,7 +41,7 @@ namespace Armory.BL.Model
 			}
 
 			CloseConnection();
-			Result = DocumentResult.Saved;
+			Result = MessageResult.Saved;
 			return Result;
 		}
 
@@ -218,7 +218,7 @@ namespace Armory.BL.Model
             }
             catch
             {
-                Result = DocumentResult.NotSaved;
+                Result = MessageResult.NotSaved;
                 CloseConnection();
                 return false;
             }

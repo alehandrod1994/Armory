@@ -17,7 +17,7 @@ namespace Armory.UI.Commands
             if (form.ShowDialog() == DialogResult.OK)
             {
                 db.Positions.Add(form.Position!);
-                SaveChanges(db, "Данные успешно сохранены.");
+                SaveChanges(db);
             }
         }
 
@@ -28,40 +28,34 @@ namespace Armory.UI.Commands
                 var form = new AddPosition(db, position);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    SaveChanges(db, "Данные успешно изменены.");
+                    SaveChanges(db);
                 }
             }
         }
 
-        public void Remove(ArmoryContext db, int id)
+        public void Remove(ArmoryContext db, List<int> ids)
         {
-            if (db.Positions.Find(id) is Position position)
-            {
-                db.Positions.Remove(position);
-                SaveChanges(db, "Данные успешно удалены.");
-            }
+            //if (db.Positions.Find(ids) is Position position)
+            //{
+            //    db.Positions.Remove(position);
+            //    SaveChanges(db, "Данные успешно удалены.");
+            //}
         }
 
-        public void Import(ArmoryContext db)
+        public void Import(ArmoryContext db, Integrator integrator)
         {
-            string path = ImportDataFromExcel();
+            //List<Position>? positions = integrator.ImportPositions();
 
-            if (path != "")
-            {
-                var integrator = new Integrator(db, path);
-                List<Position>? positions = integrator.ImportPositionData();
-
-                if (positions != null)
-                {
-                    db.Positions.AddRange(positions);
-                    SaveChanges(db, "Данные успешно добавлены.");
-                }
-                else
-                {
-                    var messageController = new MessageController();
-                    MessageBox.Show(messageController.GetMessage(integrator.Result));
-                }
-            }
+            //if (positions != null)
+            //{
+            //    db.Positions.AddRange(positions);
+            //    SaveChanges(db, "Данные успешно добавлены.");
+            //}
+            //else
+            //{
+            //    var messageController = new MessageController();
+            //    MessageBox.Show(messageController.GetMessage(integrator.Result));
+            //}
         }
     }
 }

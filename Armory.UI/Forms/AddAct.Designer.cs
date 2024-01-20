@@ -197,9 +197,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(63, 275);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(189, 15);
+            this.label6.Size = new System.Drawing.Size(188, 15);
             this.label6.TabIndex = 16;
-            this.label6.Text = "Введите характиристики оружия:";
+            this.label6.Text = "Введите характеристики оружия:";
             // 
             // tbWeaponBaggageTagNumber
             // 
